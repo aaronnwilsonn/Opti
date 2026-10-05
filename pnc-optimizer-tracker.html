@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzles & Chaos Strategic Optimizer Pro</title>
+    <!-- Tesseract.js OCR engine (all recognition runs locally in your browser) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --accent-blue: #38bdf8;
+            --accent-green: #10b981;
+            --accent-orange: #f97316;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --dark: #a855f7; --fire: #ef4444; --ice: #3b82f6; --light: #eab308; --nature: #22c55e;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); padding: 15px; font-size: 14px; }
+        header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        header h1 { color: var(--accent-blue); font-size: 1.8rem; margin-bottom: 5px; }
+        header p { color: var(--text-muted); font-size: 0.9rem; }
+        .tab-nav { display: flex; gap: 5px; margin-bottom: 15px; background: var(--bg-dark); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .tab-btn { flex: 1; padding: 12px; background: transparent; border: none; color: var(--text-muted); font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+        .tab-btn.active { background: var(--accent-blue); color: #000; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .main-layout { max-width: 1200px; margin: 0 auto; }
+        .panel { background-color: var(--card-bg); border-radius: 8px; padding: 15px; border: 1px solid var(--border-color); margin-bottom: 15px; }
+        h2 { font-size: 1.1rem; margin-bottom: 12px; border-left: 4px solid var(--accent-blue); padding-left: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 4px; color: var(--text-muted); font-weight: 600; }
+        select, input[type="number"], input[type="text"] { width: 100%; padding: 10px; background: var(--bg-dark); color: #fff; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.95rem; }
+        .btn { background-color: var(--accent-blue); color: #000; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; font-size: 1rem; }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .scanner-box { border: 2px dashed var(--accent-blue); border-radius: 8px; padding: 30px; text-align: center; background: rgba(56, 189, 248, 0.03); cursor: pointer; margin-bottom: 15px; }
+        .scanner-box p { color: var(--text-main); margin-bottom: 5px; font-weight: bold; }
+        #fileInput { display: none; }
+        .review-box { background: var(--bg-dark); border: 1px solid var(--accent-blue); border-radius: 6px; padding: 12px; margin-bottom: 15px; display: none; }
+        .review-list { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; margin: 10px 0; }
+        .review-item { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 8px; border-radius: 4px; font-size: 0.85rem; gap: 8px; }
+        .review-item.unsure { border: 1px solid var(--accent-orange); }
+        .review-item .rname { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .roster-filters { display: flex; gap: 8px; margin-bottom: 12px; }
+        .roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; max-height: 550px; overflow-y: auto; padding-right: 5px; }
+        .roster-item { background: var(--bg-dark); border: 1px solid var(--border-color); padding: 12px; border-radius: 6px; display: flex; flex-direction: column; gap: 8px; }
+        .roster-item.unlocked { border-color: var(--accent-blue); background: rgba(56, 189, 248, 0.02); }
+        .roster-item.scanned { border-color: var(--accent-green); }
+        .roster-top { display: flex; justify-content: space-between; align-items: center; }
+        .roster-info h3 { font-size: 0.95rem; font-weight: bold; }
+        .roster-info span { font-size: 0.75rem; color: var(--text-muted); text-transform: capitalize; display: block; }
+        .roster-checkbox { width: 18px; height: 18px; cursor: pointer; }
+        .roster-details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .roster-details label { font-size: 0.75rem; }
+        .optimization-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 15px; }
+        @media (max-width: 768px) { .optimization-layout { grid-template-columns: 1fr; } }
+        .lineup-display { display: flex; flex-direction: column; gap: 10px; }
+        .hero-slot { background: var(--bg-dark); border: 1px solid var(--border-color); padding: 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+        .hero-slot.center-slot { border-color: var(--accent-blue); background: rgba(56, 189, 248, 0.03); }
+        .hero-element { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; font-weight: bold; margin-left: 5px; }
+        .element-dark { background: var(--dark); color: #fff; }
+        .element-fire { background: var(--fire); color: #fff; }
+        .element-ice { background: var(--ice); color: #fff; }
+        .element-light { background: var(--light); color: #000; }
+        .element-nature { background: var(--nature); color: #fff; }
+        .status-badge { font-size: 0.8rem; font-weight: bold; }
+        .status-owned { color: var(--accent-green); }
+        .status-missing { color: var(--fire); }
+        .analysis-box { background: var(--bg-dark); padding: 15px; border-radius: 6px; border-left: 4px solid var(--accent-blue); margin-bottom: 12px; }
+        .metric-badge { font-size: 0.75rem; padding: 2px 6px; background: var(--border-color); border-radius: 4px; color: var(--text-main); }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Puzzles & Chaos Strategic Optimizer Pro</h1>
+        <p>Dynamic Lineup Engineering Engine & Account Asset Sync Tool</p>
+    </header>
+    <div class="main-layout">
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('roster-tab', this)">1. Hero Database</button>
+            <button class="tab-btn" onclick="switchTab('scanner-tab', this)">2. Screenshot Scanner</button>
+            <button class="tab-btn" onclick="switchTab('optimizer-tab', this)">3. Lineup Optimization</button>
+        </div>
+
+        <div id="roster-tab" class="tab-content active">
+            <div class="panel">
+                <h2>Roster Asset Database Manager <span id="rosterCount" style="font-size:0.85rem; color:var(--text-muted);"></span></h2>
+                <div class="roster-filters">
+                    <select id="filterElement" onchange="filterRosterGrid()">
+                        <option value="all">All Elements</option>
+                        <option value="fire">Fire</option>
+                        <option value="ice">Ice</option>
+                        <option value="nature">Nature</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                    <select id="filterType" onchange="filterRosterGrid()">
+                        <option value="all">All Army Units</option>
+                        <option value="Infantry">Infantry</option>
+                        <option value="Cavalry">Cavalry</option>
+                        <option value="Archer">Archer</option>
+                        <option value="All-round">All-round</option>
+                        <option value="Civil">Civil</option>
+                    </select>
+                    <input type="text" id="filterSearch" placeholder="Search..." oninput="filterRosterGrid()">
+                </div>
+                <div id="rosterGrid" class="roster-grid"></div>
+            </div>
+        </div>
+
+        <div id="scanner-tab" class="tab-content">
+            <div class="panel">
+                <h2>Multi-Image OCR Matrix Scanner</h2>
+                <div class="scanner-box" id="scannerBox" onclick="document.getElementById('fileInput').click()">
+                    <p>📷 Tap to upload or select multiple hero screenshot files simultaneously</p>
+                    <span style="color:var(--accent-blue);">Supports queue-processing layout formats</span>
+                    <input type="file" id="fileInput" accept="image/*" multiple onchange="handleBatchScan(event)">
+                </div>
+                <div id="reviewBox" class="review-box">
+                    <h3>Verify Scanned Lineup Detections</h3>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">Uncheck any items that were matched incorrectly before updating data cards:</p>
+                    <div id="reviewList" class="review-list"></div>
+                    <button class="btn" style="background: var(--accent-green);" onclick="commitScannedSelection()">Sync Selected Heroes to Assets</button>
+                </div>
+                <div id="scanStatus" style="font-size:0.9rem; color:var(--text-muted);"></div>
+            </div>
+        </div>
+
+        <div id="optimizer-tab" class="tab-content">
+            <div class="panel">
+                <h2>Optimization Parameters</h2>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-bottom:12px;">
+                    <div class="form-group">
+                        <label>Target Game Mode / Event</label>
+                        <select id="targetMode" onchange="updateDifficultySelectors()">
+                            <option value="campaign">Campaign Progression (Match-3 Stages)</option>
+                            <option value="arena">Arena / Royal Arena (Hero Combat PvP)</option>
+                            <option value="trial">Alliance Trial / Untamed Hunt (Bosses)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="difficultySlot">
+                        <label>Difficulty</label>
+                        <div id="difficultyControl"></div>
+                    </div>
+                </div>
+                <button class="btn" id="optimizeBtn" onclick="generateOptimizedLineup()">Generate Optimized Lineup</button>
+            </div>
+            <div class="optimization-layout">
+                <div class="panel">
+                    <h2>Recommended Deployment</h2>
+                    <div id="lineupDisplay" class="lineup-display">
+                        <p style="color: var(--text-muted); text-align: center; padding: 20px 0;">Set parameters and generate.</p>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h2>Tactical Analysis</h2>
+                    <div id="analysisFeed">
+                        <p style="color: var(--text-muted); text-align: center; padding: 20px 0;">Analysis appears here after generation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Complete Hero Database (80 entries, wiki-verified)
+        const HERO_DB = [
+            { id: "baron", name: "Baron", element: "fire", stars: 2, troop: "Archer" },
+            { id: "lucia", name: "Lucia", element: "fire", stars: 3, troop: "Civil" },
+            { id: "tulios", name: "Tulios", element: "fire", stars: 3, troop: "Civil" },
+            { id: "capos", name: "Capos", element: "fire", stars: 4, troop: "Cavalry" },
+            { id: "tooka", name: "Tooka", element: "fire", stars: 4, troop: "Infantry" },
+            { id: "anastasia", name: "Anastasia", element: "fire", stars: 5, troop: "All-round" },
+            { id: "fiona", name: "Fiona", element: "fire", stars: 5, troop: "Civil" },
+            { id: "kanye", name: "Kanye", element: "fire", stars: 5, troop: "Archer" },
+            { id: "lylia", name: "Lylia", element: "fire", stars: 5, troop: "Civil" },
+            { id: "moleg", name: "Moleg", element: "fire", stars: 5, troop: "Civil" },
+            { id: "norris", name: "Norris", element: "fire", stars: 5, troop: "Archer" },
+            { id: "saya", name: "Saya", element: "fire", stars: 5, troop: "Civil" },
+            { id: "tutanhet", name: "Tutanhet", element: "fire", stars: 5, troop: "Archer" },
+            { id: "infernal_tooka", name: "Infernal Tooka", element: "fire", stars: 5, troop: "Civil" },
+            { id: "ocularion", name: "Ocularion", element: "fire", stars: 6, troop: "Cavalry" },
+            { id: "oichi", name: "Oichi", element: "fire", stars: 6, troop: "Civil" },
+            { id: "sirius", name: "Sirius", element: "fire", stars: 6, troop: "Archer" },
+            { id: "sophia", name: "Sophia", element: "ice", stars: 2, troop: "Cavalry" },
+            { id: "ada", name: "Ada", element: "ice", stars: 3, troop: "Infantry" },
+            { id: "axel", name: "Axel", element: "ice", stars: 3, troop: "Infantry" },
+            { id: "andre", name: "Andre", element: "ice", stars: 4, troop: "Infantry" },
+            { id: "odell", name: "Odell", element: "ice", stars: 4, troop: "Civil" },
+            { id: "viola", name: "Viola", element: "ice", stars: 4, troop: "Infantry" },
+            { id: "apan", name: "Apan", element: "ice", stars: 5, troop: "Infantry" },
+            { id: "basilong", name: "Basilong", element: "ice", stars: 5, troop: "Civil" },
+            { id: "echo", name: "Echo", element: "ice", stars: 5, troop: "Civil" },
+            { id: "edith", name: "Edith", element: "ice", stars: 5, troop: "Archer" },
+            { id: "neptune", name: "Neptune", element: "ice", stars: 5, troop: "Civil" },
+            { id: "ogremire", name: "Ogremire", element: "ice", stars: 5, troop: "Civil" },
+            { id: "selantia", name: "Selantia", element: "ice", stars: 5, troop: "Infantry" },
+            { id: "tania", name: "Tania", element: "ice", stars: 5, troop: "Cavalry" },
+            { id: "vynora", name: "Vynora", element: "ice", stars: 6, troop: "All-round" },
+            { id: "luke", name: "Luke", element: "nature", stars: 2, troop: "Infantry" },
+            { id: "gerolin", name: "Gerolin", element: "nature", stars: 3, troop: "Infantry" },
+            { id: "roger", name: "Roger", element: "nature", stars: 3, troop: "Archer" },
+            { id: "cassandra", name: "Cassandra", element: "nature", stars: 4, troop: "Civil" },
+            { id: "dolly", name: "Dolly", element: "nature", stars: 4, troop: "Archer" },
+            { id: "shubert", name: "Shubert", element: "nature", stars: 4, troop: "Archer" },
+            { id: "wallace", name: "Wallace", element: "nature", stars: 4, troop: "Infantry" },
+            { id: "boyd", name: "Boyd", element: "nature", stars: 5, troop: "Cavalry" },
+            { id: "dimina", name: "Dimina", element: "nature", stars: 5, troop: "Cavalry" },
+            { id: "freya", name: "Freya", element: "nature", stars: 5, troop: "Archer" },
+            { id: "guanyu", name: "Guan Yu", element: "nature", stars: 5, troop: "Civil" },
+            { id: "kaira", name: "Kaira", element: "nature", stars: 5, troop: "Civil" },
+            { id: "kujomamoru", name: "Kujo Mamoru", element: "nature", stars: 5, troop: "Infantry" },
+            { id: "seagoddess", name: "Sea Goddess", element: "nature", stars: 5, troop: "Civil" },
+            { id: "sodoma", name: "Sodoma", element: "nature", stars: 5, troop: "Cavalry" },
+            { id: "tala", name: "Tala", element: "nature", stars: 5, troop: "Civil" },
+            { id: "valerius", name: "Valerius", element: "nature", stars: 5, troop: "All-round" },
+            { id: "velosa", name: "Velosa", element: "nature", stars: 5, troop: "Infantry" },
+            { id: "penny", name: "Penny", element: "light", stars: 2, troop: "Civil" },
+            { id: "aemon", name: "Aemon", element: "light", stars: 3, troop: "Archer" },
+            { id: "hannah", name: "Hannah", element: "light", stars: 3, troop: "Cavalry" },
+            { id: "christina", name: "Christina", element: "light", stars: 4, troop: "Cavalry" },
+            { id: "hanzo", name: "Hanzo", element: "light", stars: 4, troop: "Archer" },
+            { id: "angelita", name: "Angelita", element: "light", stars: 5, troop: "Archer" },
+            { id: "carvell", name: "Carvell", element: "light", stars: 5, troop: "Civil" },
+            { id: "edmund", name: "Edmund", element: "light", stars: 5, troop: "Civil" },
+            { id: "kaios", name: "Kaios", element: "light", stars: 5, troop: "Civil" },
+            { id: "leona", name: "Leona", element: "light", stars: 5, troop: "Civil" },
+            { id: "maxim", name: "Maxim", element: "light", stars: 5, troop: "Civil" },
+            { id: "oskir", name: "Oskir", element: "light", stars: 5, troop: "Civil" },
+            { id: "patty", name: "Patty", element: "light", stars: 5, troop: "Civil" },
+            { id: "rodriguez", name: "Rodriguez", element: "light", stars: 5, troop: "Infantry" },
+            { id: "wukong", name: "Wu Kong", element: "light", stars: 5, troop: "Civil" },
+            { id: "william", name: "William", element: "dark", stars: 2, troop: "Civil" },
+            { id: "chloe", name: "Chloe", element: "dark", stars: 3, troop: "Civil" },
+            { id: "claudia", name: "Claudia", element: "dark", stars: 3, troop: "Cavalry" },
+            { id: "elsa", name: "Elsa", element: "dark", stars: 4, troop: "Civil" },
+            { id: "gina", name: "Gina", element: "dark", stars: 4, troop: "Civil" },
+            { id: "aerposia", name: "Aerposia", element: "dark", stars: 5, troop: "Cavalry" },
+            { id: "aurora", name: "Aurora", element: "dark", stars: 5, troop: "Civil" },
+            { id: "eric", name: "Eric", element: "dark", stars: 5, troop: "Infantry" },
+            { id: "eris", name: "Eris", element: "dark", stars: 5, troop: "Cavalry" },
+            { id: "estelle", name: "Estelle", element: "dark", stars: 5, troop: "Civil" },
+            { id: "khaos", name: "Khaos", element: "dark", stars: 5, troop: "Civil" },
+            { id: "monica", name: "Monica", element: "dark", stars: 5, troop: "Civil" },
+            { id: "setemos", name: "Setemos", element: "dark", stars: 5, troop: "Civil" },
+            { id: "sirona", name: "Sirona", element: "dark", stars: 5, troop: "Civil" },
+            { id: "violette", name: "Violette", element: "dark", stars: 5, troop: "Civil" },
+        ];
+        console.log('Heroes indexed:', HERO_DB.length);
+
+        // ---------- State ----------
+        let userRoster = {};
+        try { userRoster = JSON.parse(localStorage.getItem('pnc_roster_v2')) || {}; } catch (e) { userRoster = {}; }
+        HERO_DB.forEach(function(h) {
+            let d = userRoster[h.id];
+            if (!d || typeof d !== 'object') d = {};
+            userRoster[h.id] = {
+                owned: !!d.owned,
+                level: Math.min(400, Math.max(1, parseInt(d.level != null ? d.level : d.lvl) || 1)),
+                enhancement: Math.min(8, Math.max(0, parseInt(d.enhancement != null ? d.enhancement : d.enh) || 0))
+            };
+        });
+        let lastScanned = {};
+        let pendingDetections = [];
+        let scanning = false;
+
+        function persist() {
+            try { localStorage.setItem('pnc_roster_v2', JSON.stringify(userRoster)); } catch (e) {}
+        }
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); });
+            document.getElementById(tabId).classList.add('active');
+            document.querySelectorAll('.tab-nav .tab-btn').forEach(function(b){ b.classList.remove('active'); });
+            if (btn) btn.classList.add('active');
+        }
+
+        // ---------- Roster with filters ----------
+        function filterRosterGrid() { renderRoster(); }
+        function renderRoster() {
+            const fe = document.getElementById('filterElement').value;
+            const ft = document.getElementById('filterType').value;
+            const q = (document.getElementById('filterSearch').value || '').toLowerCase();
+            const grid = document.getElementById('rosterGrid');
+            grid.innerHTML = '';
+            let shown = 0, owned = 0;
+            HERO_DB.forEach(function(h) {
+                if (userRoster[h.id].owned) owned++;
+                if (fe !== 'all' && h.element !== fe) return;
+                if (ft !== 'all' && h.troop !== ft) return;
+                if (q && h.name.toLowerCase().indexOf(q) === -1) return;
+                shown++;
+                grid.appendChild(buildRosterCard(h));
+            });
+            document.getElementById('rosterCount').textContent = '(Owned: ' + owned + '/' + HERO_DB.length + ') \u00b7 showing ' + shown;
+        }
+
+        function buildRosterCard(h) {
+            const state = userRoster[h.id];
+            let opts = '';
+            for (let v = 0; v <= 8; v++) {
+                opts += '<option value="' + v + '"' + (state.enhancement === v ? ' selected' : '') + '>+' + v + '</option>';
+            }
+            const item = document.createElement('div');
+            item.className = 'roster-item' + (state.owned ? ' unlocked' : '') + (lastScanned[h.id] ? ' scanned' : '');
+            item.innerHTML =
+                '<div class="roster-top"><div class="roster-info"><h3>' + h.name + '</h3>' +
+                '<span>' + h.stars + '\u2605 ' + h.element + ' \u00b7 ' + h.troop + (h.troop === 'Civil' ? ' (passive)' : '') + '</span></div>' +
+                '<input type="checkbox" class="roster-checkbox"' + (state.owned ? ' checked' : '') + '></div>' +
+                '<div class="roster-details">' +
+                    '<div><label>Level (1-400)</label><input type="number" min="1" max="400" value="' + state.level + '" data-field="level"></div>' +
+                    '<div><label>Enhancement (+0-8)</label><select data-field="enhancement">' + opts + '</select></div>' +
+                '</div>';
+            const cb = item.querySelector('.roster-checkbox');
+            cb.addEventListener('change', function() {
+                userRoster[h.id].owned = cb.checked;
+                persist(); renderRoster();
+            });
+            item.querySelectorAll('input[data-field], select[data-field]').forEach(function(el) {
+                el.addEventListener('change', function() {
+                    const field = el.getAttribute('data-field');
+                    let v = parseInt(el.value) || 0;
+                    if (field === 'level') v = Math.min(400, Math.max(1, v));
+                    if (field === 'enhancement') v = Math.min(8, Math.max(0, v));
+                    userRoster[h.id][field] = v;
+                    persist();
+                });
+            });
+            return item;
+        }
+
+        function setScanStatus(msg) {
+            document.getElementById('scanStatus').textContent = msg;
+        }
+
+        // ---------- Strict fuzzy matching ----------
+        function normalize(s) {
+            return (s || '').toLowerCase().replace(/[^a-z ]/g, ' ').replace(/\s+/g, ' ').trim();
+        }
+        function levenshtein(a, b) {
+            const m = a.length, n = b.length;
+            if (!m) return n; if (!n) return m;
+            const d = [];
+            for (let i = 0; i <= m; i++) d[i] = [i];
+            for (let j = 0; j <= n; j++) d[0][j] = j;
+            for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++)
+                d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+            return d[m][n];
+        }
+        function matchHeroesStrict(ocrText) {
+            const words = normalize(ocrText).split(' ').filter(function(w){ return w.length >= 2; });
+            const found = {}, skipped = [];
+            HERO_DB.forEach(function(h) {
+                const name = normalize(h.name);
+                const parts = name.split(' ');
+                let best = Infinity, bestFrag = '';
+                for (let i = 0; i < words.length; i++) {
+                    const win = words.slice(i, i + parts.length).join(' ');
+                    const dist = levenshtein(win, name);
+                    if (dist < best) { best = dist; bestFrag = win; }
+                    parts.forEach(function(part) {
+                        if (part.length >= 5) {
+                            const d2 = levenshtein(words[i], part);
+                            if (d2 < best) { best = d2; bestFrag = words[i]; }
+                        }
+                    });
+                }
+                if (best <= 1) found[h.id] = { hero: h, dist: best };
+                else if (best <= 2) skipped.push(h.name);
+            });
+            return { found: found, skipped: skipped };
+        }
+
+        // ---------- Batch scanner + review ----------
+        const scannerBox = document.getElementById('scannerBox');
+        scannerBox.addEventListener('dragover', function(e){ e.preventDefault(); });
+        scannerBox.addEventListener('drop', function(e){
+            e.preventDefault();
+            const files = e.dataTransfer.files ? Array.prototype.slice.call(e.dataTransfer.files) : [];
+            if (files.length) handleBatchScan({ target: { files: files } });
+        });
+
+        function preprocessImage(img) {
+            const MAX = 1600;
+            let w = img.naturalWidth, h = img.naturalHeight;
+            const scale = Math.min(1, MAX / Math.max(w, h));
+            w = Math.round(w * scale); h = Math.round(h * scale);
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const imgData = ctx.getImageData(0, 0, w, h);
+            const d = imgData.data, contrast = 1.35;
+            for (let i = 0; i < d.length; i += 4) {
+                const g = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+                let v = (g - 128) * contrast + 128;
+                d[i] = d[i+1] = d[i+2] = v < 0 ? 0 : (v > 255 ? 255 : v);
+            }
+            ctx.putImageData(imgData, 0, 0);
+            return canvas;
+        }
+
+        function loadImageFromFile(file) {
+            return new Promise(function(res, rej){
+                const url = URL.createObjectURL(file);
+                const im = new Image();
+                im.onload = function(){ URL.revokeObjectURL(url); res(im); };
+                im.onerror = function(){ URL.revokeObjectURL(url); rej(new Error('Could not read ' + file.name)); };
+                im.src = url;
+            });
+        }
+
+        async function handleBatchScan(event) {
+            const files = event.target && event.target.files ? Array.prototype.slice.call(event.target.files) : [];
+            const images = files.filter(function(f){ return f.type && f.type.indexOf('image/') === 0; });
+            if (images.length === 0 || scanning) {
+                if (!scanning) setScanStatus('No image files found. Please choose screenshot files (PNG/JPG).');
+                return;
+            }
+            if (typeof Tesseract === 'undefined') {
+                setScanStatus('OCR engine could not load (needs network once). You can still manage your roster manually in the Hero Database tab.');
+                return;
+            }
+            scanning = true;
+            document.getElementById('reviewBox').style.display = 'none';
+            const total = images.length;
+            const foundAll = {}, skippedAll = [];
+            try {
+                for (let i = 0; i < total; i++) {
+                    const file = images[i];
+                    setScanStatus('\u23f3 Scanning ' + (i + 1) + '/' + total + ': ' + file.name);
+                    const img = await loadImageFromFile(file);
+                    const canvas = preprocessImage(img);
+                    let r1 = await Tesseract.recognize(canvas, 'eng');
+                    let res = matchHeroesStrict(r1.data.text || '');
+                    if (Object.keys(res.found).length < 5) {
+                        try {
+                            let r2 = await Tesseract.recognize(canvas, 'eng', { tessedit_pageseg_mode: '11' });
+                            const res2 = matchHeroesStrict(r2.data.text || '');
+                            Object.keys(res2.found).forEach(function(id){
+                                if (!res.found[id] || res2.found[id].dist < res.found[id].dist) res.found[id] = res2.found[id];
+                            });
+                            res2.skipped.forEach(function(n){
+                                if (skippedAll.indexOf(n) === -1) skippedAll.push(n);
+                            });
+                        } catch (e2) { /* keep pass-1 */ }
+                    }
+                    Object.keys(res.found).forEach(function(id){
+                        if (!foundAll[id] || res.found[id].dist < foundAll[id].dist) foundAll[id] = res.found[id];
+                    });
+                    res.skipped.forEach(function(n){
+                        if (skippedAll.indexOf(n) === -1) skippedAll.push(n);
+                    });
+                }
+
+                pendingDetections = Object.keys(foundAll).map(function(id){
+                    return { id: id, hero: foundAll[id].hero, dist: foundAll[id].dist };
+                }).sort(function(a,b){ return a.hero.name < b.hero.name ? -1 : 1; });
+
+                if (pendingDetections.length === 0) {
+                    let msg = 'Scan complete: no high-certainty hero names across ' + total + ' image' + (total === 1 ? '' : 's') + '.';
+                    if (skippedAll.length > 0) msg += ' ' + skippedAll.length + ' uncertain skipped for safety.';
+                    setScanStatus(msg + ' Try cropping tighter to the name labels.');
+                } else {
+                    renderReviewList();
+                    document.getElementById('reviewBox').style.display = 'block';
+                    let msg = 'Scan complete (' + total + ' image' + (total === 1 ? '' : 's') + '): ' + pendingDetections.length + ' candidate' + (pendingDetections.length === 1 ? '' : 's') + ' awaiting verification below.';
+                    if (skippedAll.length > 0) msg += ' (' + skippedAll.length + ' uncertain skipped for safety.)';
+                    setScanStatus(msg);
+                    document.getElementById('reviewBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            } catch (err) {
+                console.error(err);
+                setScanStatus('Scan failed (' + (err.message || 'unknown error') + ').');
+            } finally {
+                scanning = false;
+            }
+        }
+
+        function renderReviewList() {
+            const list = document.getElementById('reviewList');
+            list.innerHTML = '';
+            pendingDetections.forEach(function(p, idx) {
+                const div = document.createElement('div');
+                div.className = 'review-item' + (p.dist === 1 ? ' unsure' : '');
+                div.innerHTML =
+                    '<span class="rname" title="' + p.hero.name + '">' + p.hero.name + (p.dist === 1 ? ' (~)' : '') + '</span>' +
+                    '<input type="checkbox" data-idx="' + idx + '" checked>';
+                list.appendChild(div);
+            });
+        }
+
+        function commitScannedSelection() {
+            const boxes = document.querySelectorAll('#reviewList input[type="checkbox"]');
+            lastScanned = {};
+            const names = [];
+            boxes.forEach(function(box) {
+                if (!box.checked) return;
+                const p = pendingDetections[parseInt(box.getAttribute('data-idx'))];
+                if (!p) return;
+                userRoster[p.id].owned = true;
+                lastScanned[p.id] = true;
+                names.push(p.hero.name);
+            });
+            persist(); renderRoster();
+            pendingDetections = [];
+            document.getElementById('reviewBox').style.display = 'none';
+            names.sort();
+            if (names.length > 0) {
+                setScanStatus('\u2713 Synced ' + names.length + ' hero' + (names.length === 1 ? '' : 'es') + ' to assets: ' + names.join(', ') + '. See the Hero Database tab.');
+            } else {
+                setScanStatus('No heroes selected \u2014 nothing was synced.');
+            }
+        }
+
+        // ---------- Optimizer ----------
+        const MODE_RULES = {
+            campaign: { 'All-round': 60, Infantry: 20, Cavalry: 30, Archer: 40 },
+            arena:    { 'All-round': 40, Infantry: 60, Cavalry: 40, Archer: 50 },
+            trial:    { 'All-round': 30, Infantry: 10, Cavalry: 50, Archer: 60 }
+        };
+        const MODE_LABELS = {
+            campaign: 'Campaign Progression (Match-3 Stages)',
+            arena: 'Arena / Royal Arena (Hero Combat PvP)',
+            trial: 'Alliance Trial / Untamed Hunt (Bosses)'
+        };
+        const MODE_DIFFICULTY = {
+            campaign: { label: 'Chapter', type: 'number', value: 12, min: 1, max: 60 },
+            arena: { label: 'Arena Tier', type: 'select', options: ['Bronze', 'Silver', 'Gold', 'Diamond', 'Master', 'Challenger'] },
+            trial: { label: 'Boss Stage', type: 'number', value: 1, min: 1, max: 30 }
+        };
+        function scoreHero(h, data, mode) {
+            return h.stars * 100 + data.level * 0.6 + data.enhancement * 30 + (MODE_RULES[mode][h.troop] || 0);
+        }
+
+        function updateDifficultySelectors() {
+            const mode = document.getElementById('targetMode').value;
+            const cfg = MODE_DIFFICULTY[mode];
+            const slot = document.getElementById('difficultyControl');
+            document.querySelector('#difficultySlot label').textContent = cfg.label;
+            if (cfg.type === 'number') {
+                slot.innerHTML = '<input type="number" id="difficultyValue" min="' + cfg.min + '" max="' + cfg.max + '" value="' + cfg.value + '">';
+            } else {
+                let opts = '';
+                cfg.options.forEach(function(o){ opts += '<option>' + o + '</option>'; });
+                slot.innerHTML = '<select id="difficultyValue">' + opts + '</select>';
+            }
+        }
+
+        function generateOptimizedLineup() {
+            const mode = document.getElementById('targetMode').value;
+            const diffEl = document.getElementById('difficultyValue');
+            const difficulty = diffEl ? diffEl.value : '';
+            const diffLabel = MODE_DIFFICULTY[mode].label;
+            const owned = HERO_DB.filter(function(h){ return userRoster[h.id].owned && h.troop !== 'Civil'; });
+            const display = document.getElementById('lineupDisplay');
+            const feed = document.getElementById('analysisFeed');
+            display.innerHTML = ''; feed.innerHTML = '';
+
+            if (owned.length === 0) {
+                display.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px 0;">No owned combat heroes. Sync screenshots in the scanner tab or check heroes in the database tab.</p>';
+                feed.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px 0;">Awaiting data.</p>';
+                return;
+            }
+
+            const scored = owned.map(function(h){
+                return { h: h, d: userRoster[h.id], s: Math.round(scoreHero(h, userRoster[h.id], mode)) };
+            }).sort(function(a,b){ return b.s - a.s; });
+
+            const squad = scored.slice(0, 5);
+            const tanks = squad.filter(function(p){ return p.h.troop === 'Infantry' || p.h.troop === 'All-round'; });
+            const rest = squad.filter(function(p){ return !(p.h.troop === 'Infantry' || p.h.troop === 'All-round'); });
+            const ordered = tanks.concat(rest);
+
+            ordered.forEach(function(p, i){
+                const h = p.h, d = p.d;
+                const div = document.createElement('div');
+                div.className = 'hero-slot' + (i === 2 ? ' center-slot' : '');
+                div.innerHTML =
+                    '<div><div><strong>Slot ' + (i + 1) + ': ' + h.name + '</strong>' +
+                    '<span class="hero-element element-' + h.element + '">' + h.element + '</span> ' +
+                    '<span class="metric-badge">' + p.s + ' pts</span></div>' +
+                    '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:3px;">' +
+                    h.stars + '\u2605 ' + h.troop + ' \u00b7 Lv ' + d.level + ' \u00b7 +' + d.enhancement + '</div></div>' +
+                    '<span class="status-badge status-owned">\u2713 Ready</span>';
+                display.appendChild(div);
+            });
+
+            const elements = {};
+            ordered.forEach(function(p){ elements[p.h.element] = (elements[p.h.element] || 0) + 1; });
+            const elemSummary = Object.keys(elements).map(function(e){ return elements[e] + '\u00d7 ' + e; }).join(', ');
+            const avgScore = Math.round(ordered.reduce(function(a,p){ return a + p.s; }, 0) / ordered.length);
+
+            feed.innerHTML =
+                '<div class="analysis-box"><strong style="color:var(--text-main);">Target:</strong> <span style="color:var(--text-muted);">' + MODE_LABELS[mode] + ' \u2014 ' + diffLabel + ' ' + difficulty + '</span></div>' +
+                '<div class="analysis-box"><strong style="color:var(--text-main);">Squad power:</strong> <span class="metric-badge">' + avgScore + ' avg pts</span><br>' +
+                '<span style="font-size:0.85rem; color:var(--text-muted);">Element spread: ' + elemSummary + '. Scored from ' + owned.length + ' owned combat heroes (stars \u00d7 100 + level \u00d7 0.6 + enhancement \u00d7 30 + mode troop bonus). Civil heroes excluded \u2014 they buff passively by ownership.</span></div>' +
+                '<div class="analysis-box"><strong style="color:var(--text-main);">Tactics:</strong><br>' +
+                '<span style="font-size:0.85rem; color:var(--text-muted);">' +
+                (mode === 'trial' ? 'Cavalry and Archer troops weighted for single-target boss damage.' :
+                 mode === 'arena' ? 'Infantry bulk up front, Archer burst in back; Slot 3 is the aggro center.' :
+                 'All-round heroes weighted for balanced match-3 tile damage.') +
+                (owned.length < 5 ? '<br>Only ' + owned.length + ' owned combat heroes \u2014 showing all of them.' : '') +
+                '</span></div>';
+        }
+
+        updateDifficultySelectors();
+        renderRoster();
+    </script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+</html>
